@@ -1,17 +1,18 @@
+# vue-project
 
-### [中文](./docs/README-CN.md) | [English](./README.md)
+This template should help get you started developing with Vue 3 in Vite.
 
-# AssignmentSubmittingPlatform-Frontend
+## Recommended IDE Setup
 
-This is a project for students to submit their assignments.
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-And this project is under development.
+## Type Support for `.vue` Imports in TS
 
-This project is designed with Frontend and Backend separation.
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-Click the following links to view the repositories of the Frontend and Backend.
+## Customize configuration
 
-### [Backend Repository](https://github.com/Apricityx/ASP-BE) | [Frontend Repository](https://github.com/Apricityx/ASP-FE)
+See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
 
@@ -23,4 +24,10 @@ npm install
 
 ```sh
 npm run dev
+```
+
+### Type-Check, Compile and Minify for Production
+
+```sh
+npm run build
 ```
