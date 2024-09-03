@@ -111,10 +111,9 @@ const AMList = ref(AMListModel)
 
 <template>
     <v-row>
-        <v-col cols="5">
+        <v-col>
             <!--                主仪表盘 作业完成情况-->
-
-            <v-card class="mx-auto" width="auto" border flat>
+            <v-card class="mx-auto" width="auto" border flat style="margin-bottom: 4%" elevation="2">
                 <v-list-item class="px-6" height="88">
                     <template v-slot:prepend>
                         <v-avatar color="surface-light" size="32">🎯</v-avatar>
@@ -148,9 +147,7 @@ const AMList = ref(AMListModel)
                            @click="isShowAsMonth = !isShowAsMonth"></v-btn>
                 </template>
             </v-card>
-        </v-col>
-        <v-col cols="7">
-            <v-card :elevation="2" height="auto" width="auto" title="作业概览">
+            <v-card elevation="2" height="auto" width="auto" title="作业概览" style="user-select: none">
                 <template v-slot:append>
                     <v-btn
                         prepend-icon="mdi-open-in-new"

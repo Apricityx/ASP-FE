@@ -23,6 +23,8 @@ const getGreeting = () => {
 }
 </script>
 <template>
+<!--    上传文件-->
+
     <v-layout class="rounded rounded-md">
         <v-navigation-drawer v-model="drawerOpen">
             <v-list-item :title="getGreeting() + ' ' + Std.name" subtitle="Student"></v-list-item>
