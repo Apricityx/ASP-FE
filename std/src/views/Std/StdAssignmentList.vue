@@ -4,57 +4,16 @@ import router from "@/router";
 import {ref} from "vue";
 import {tr} from "vuetify/locale";
 import upload from "@/component/upload.vue";
+import {AMListModel} from "@/requests/getAM";
+import type {Assignment} from "@/requests/getAM";
+import {stdInfo} from "@/requests/getStdInfo";
 
-interface StdInfo {
-  name: string
-  number: number
+const checkIsOutdated = (AMDeadline:string) => {
+  const now = new Date()
+  const deadline = new Date(AMDeadline)
+  return now > deadline
 }
 
-interface Assignment {
-  name: string
-  total: number
-  submitted: number
-  isSubmitted: boolean
-  deadline: string
-  show?: boolean
-}
-
-
-let AMListModel: Assignment[] = []
-
-//=======================================================
-// 模拟数据
-const stdInfo: StdInfo = {
-  name: 'Student1',
-  number: 123
-}
-AMListModel.push({
-  name: 'Assignment1',
-  total: 10,
-  submitted: 5,
-  isSubmitted: false,
-  deadline: '2024-9-5'
-})
-AMListModel.push({
-  name: 'Assignment2',
-  total: 10,
-  submitted: 10,
-  isSubmitted: true,
-  deadline: '2024-8-3'
-})
-AMListModel.push({
-  name: 'Assignment3',
-  total: 10,
-  submitted: 2,
-  isSubmitted: false,
-  deadline: '2024-8-3'
-})
-//=======================================================
-
-// AM加上是否折叠字段
-for (let AM of AMListModel) {
-  AM.show = !AM.isSubmitted;
-}
 const AMList = ref(AMListModel)
 
 // 当isLoadingAM为T时，按钮和列表都会重新加载
@@ -64,7 +23,6 @@ const getAssignments = async () => {
   setTimeout(() => {
     isLoadingAM.value = false
   }, 2000)
-
 }
 
 const dialog = ref(false)
@@ -83,7 +41,7 @@ const openUpload = (AM: Assignment) => {
         <v-toolbar-title>提交</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <upload :message="JSON.stringify(uploadAM)" />
+      <upload :message="JSON.stringify(uploadAM)"/>
     </v-card>
   </v-dialog>
   <v-row>
@@ -101,7 +59,7 @@ const openUpload = (AM: Assignment) => {
               :disabled="isLoadingAM"
           ></v-btn>
         </template>
-        <v-row style="margin:0 2% 2% 2%">
+        <v-row style="margin:5px">
           <v-col cols="12">
             <v-card v-for="AM in AMList" style="margin-bottom: 2%"
                     :color="AM.isSubmitted? 'light-green-lighten-5':'orange-lighten-5'"
@@ -118,7 +76,10 @@ const openUpload = (AM: Assignment) => {
                   ></v-icon>
                   {{ AM.isSubmitted ? '已提交' : '未提交' }}
                 </template>
-                <v-card-text>
+                <v-card-text style="color:red" v-show="checkIsOutdated(AM.deadline)">
+                  截止日期: {{ AM.deadline }}
+                </v-card-text>
+                <v-card-text v-show="!checkIsOutdated(AM.deadline)">
                   截止日期: {{ AM.deadline }}
                 </v-card-text>
               </v-card-item>
@@ -126,7 +87,7 @@ const openUpload = (AM: Assignment) => {
               <v-expand-transition>
                 <div v-show="AM.show" style="height: 70px;">
                   <v-divider></v-divider>
-                  <v-row style="margin: 5px" v-show="AM.isSubmitted">
+                  <v-row v-show="AM.isSubmitted" style="margin:5px">
                     <v-col cols="3">
                       <v-btn block color="light-blue-darken-1" prepend-icon="mdi-upload-off"
                              elevation="0" text="已提交" disabled></v-btn>
@@ -143,7 +104,7 @@ const openUpload = (AM: Assignment) => {
                              elevation="0" text="查看"></v-btn>
                     </v-col>
                   </v-row>
-                  <v-row style="margin: 5px" v-show="!AM.isSubmitted">
+                  <v-row v-show="!AM.isSubmitted" style="margin:5px">
                     <v-col cols="3">
                       <v-btn
                           block color="light-blue-darken-1" prepend-icon="mdi-upload"
