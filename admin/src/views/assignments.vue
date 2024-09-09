@@ -3,13 +3,13 @@
 import router from "@/router";
 import {ref} from "vue";
 import {tr} from "vuetify/locale";
-import check from "@/component/checkAM.vue";
+import newAM from "@/component/newAM.vue";
+import checkAM from "@/component/checkAM.vue";
 import {AMListModel} from "@/requests/getAM";
 import type {Assignment} from "@/requests/getAM";
 import {stdInfo} from "@/requests/getStdInfo";
 
-// 检查作业是否逾期未交
-const checkIsOutdated = (AMDeadline:string) => {
+const checkIsOutdated = (AMDeadline: string) => {
   const now = new Date()
   const deadline = new Date(AMDeadline)
   return now > deadline
@@ -26,44 +26,56 @@ const getAssignments = async () => {
   }, 2000)
 }
 
-const dialog = ref(false)
-let uploadAM = {} as Assignment
-const openUpload = (AM: Assignment) => {
-  uploadAM = AM
-  dialog.value = true
+// 控制查看作业的对话框
+const checkAMOpen = ref(false)
+let currentAM: Assignment
+const openCheckAM = (AM: Assignment) => {
+  checkAMOpen.value = true
+  currentAM = AM
 }
+
+// 控制新建作业的对话框
+const newAMOpen = ref(false)
 </script>
 
 <template>
-  <v-dialog v-model="dialog" transition="dialog-bottom-transition" fullscreen>
+  <v-dialog v-model="checkAMOpen" transition="dialog-bottom-transition" fullscreen>
     <v-card>
       <v-toolbar>
-        <v-btn icon="mdi-close" @click="dialog = false"></v-btn>
+        <v-btn icon="mdi-close" @click="checkAMOpen = false"></v-btn>
         <v-toolbar-title>提交</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <check :message="JSON.stringify(uploadAM)"/>
+      <checkAM :message="JSON.stringify(currentAM)"/>
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="dialog" transition="dialog-bottom-transition" fullscreen>
+  <v-dialog v-model="newAMOpen" transition="dialog-bottom-transition" fullscreen>
     <v-card>
       <v-toolbar>
-        <v-btn icon="mdi-close" @click="dialog = false"></v-btn>
-        <v-toolbar-title>提交</v-toolbar-title>
+        <v-btn icon="mdi-close" @click="newAMOpen = false"></v-btn>
+        <v-toolbar-title>新建作业</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <upload :message="JSON.stringify(uploadAM)"/>
+      <newAM/>
     </v-card>
   </v-dialog>
-
-
   <v-row>
     <v-col cols="12">
       <v-card :elevation="2" height="auto" width="auto" title="作业列表" :loading="isLoadingAM"
               style="user-select: none">
         <template v-slot:append>
           <v-btn
+              prepend-icon="mdi-plus"
+              color="primary"
+              text="新建作业"
+              variant="outlined"
+              slim
+              @click="newAMOpen = true"
+              :disabled="isLoadingAM"
+          ></v-btn>
+          <v-btn
+              style="margin-left: 10px"
               prepend-icon="mdi-refresh"
               color="primary"
               text="刷新"
@@ -110,7 +122,7 @@ const openUpload = (AM: Assignment) => {
                       <v-btn
                           block color="light-blue-darken-1" prepend-icon="mdi-pencil"
                           elevation="0" text="修改"
-                          @click="openUpload(AM)"
+                          @click=""
                       ></v-btn>
                     </v-col>
                     <v-col cols="3">
@@ -123,7 +135,7 @@ const openUpload = (AM: Assignment) => {
                       <v-btn
                           block color="light-blue-darken-1" prepend-icon="mdi-upload"
                           elevation="0" text="提交"
-                          @click="openUpload(AM)"
+                          @click="openCheckAM(AM)"
                       ></v-btn>
                     </v-col>
                     <v-col cols="3">

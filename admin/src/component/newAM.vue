@@ -5,19 +5,6 @@ import {stdInfo} from "@/requests/getStdInfo";
 import type {Assignment} from "@/requests/getAM"
 import type { StdInfo } from "@/requests/getStdInfo"
 
-const props = defineProps({
-  message: {
-    type: String,
-    required: true
-  }
-})
-const AM: Assignment = JSON.parse(props.message)
-const checkIsOutdated = () => {
-  const now = new Date()
-  const deadline = new Date(AM.deadline)
-  return now > deadline
-}
-
 // 表单验证
 const valid = ref(true)
 const validRule = ref({
@@ -37,12 +24,10 @@ Form.value.name = stdInfo.name
 
 <template>
   服务器地址：{{ Config.beServerAddress }}
-  {{ AM.name }}
-  {{ checkIsOutdated() }}
   <v-card
       class="mx-auto"
       prepend-icon="mdi-upload"
-      :subtitle="`${AM.name}`"
+      subtitle="新建作业"
       width="80%"
   >
     <template v-slot:title>
@@ -52,7 +37,7 @@ Form.value.name = stdInfo.name
     <v-card-text class="bg-surface-light pt-4">
       <v-card-item>
         <template v-slot:subtitle>
-          <v-container v-show="checkIsOutdated()">
+          <v-container v-show="">
             <v-icon
                 class="me-1 pb-1"
                 color="error"
