@@ -5,6 +5,7 @@ import {tr} from "vuetify/locale";
 import {AMListModel, type Assignment} from "@/requests/getAM";
 import {switchMonthCounter, switchAllCounter, type SubmitCounter} from "@/requests/getAMCounter";
 import {all} from "axios";
+import {red} from "vuetify/util/colors";
 
 // 计算总进度条
 
@@ -64,7 +65,7 @@ const AMList = ref(AMListModel)
   <v-row>
     <v-col>
       <!--                主仪表盘 作业完成情况-->
-      <v-card class="mx-auto" width="auto" border flat style="margin-bottom: 4%" elevation="2">
+      <v-card class="mx-auto" width="auto" style="margin-bottom: 20px" elevation="1">
         <v-list-item class="px-6" height="88">
           <template v-slot:prepend>
             <v-avatar color="surface-light" size="32">🎯</v-avatar>
@@ -99,7 +100,7 @@ const AMList = ref(AMListModel)
                  @click="changeCountType()"></v-btn>
         </template>
       </v-card>
-      <v-card elevation="2" height="auto" width="auto" title="作业概览" style="user-select: none">
+      <v-card elevation="1" height="auto" width="auto" title="作业概览" style="user-select: none">
         <template v-slot:append>
           <v-btn
               prepend-icon="mdi-open-in-new"
@@ -113,14 +114,16 @@ const AMList = ref(AMListModel)
         <v-row style="margin:0 2% 2% 2%">
           <v-col cols="12">
             <v-card v-for="AM in AMList" style="margin-bottom: 2%"
-                    :color="AM.total === AM.submitted? 'light-green-lighten-5':'blue-darken-4'" hover
+                    hover
+                    variant="elevated"
                     @click="AM.show = !AM.show"
+                    elevation="2"
             >
               <v-card-item :title="AM.name" :append-icon="AM.show ? 'mdi-chevron-up' : 'mdi-chevron-down'">
                 <template v-slot:subtitle>
                   <v-icon
                       class="me-1 pb-1"
-                      :color="AM.total === AM.submitted ? 'success': 'white'"
+                      :color="AM.total === AM.submitted ? 'green-lighten-1': 'light-blue-lighten-4'"
                       :icon="AM.total === AM.submitted ? 'mdi-check-circle' : 'mdi-alert-circle'"
                       size="15"
                   ></v-icon>

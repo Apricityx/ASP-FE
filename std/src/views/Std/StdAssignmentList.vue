@@ -74,7 +74,8 @@ const openUpload = (AM: Assignment) => {
         <v-row style="margin:5px">
           <v-col cols="12">
             <v-card v-for="AM in AMList" style="margin-bottom: 2%"
-                    :color="AM.isSubmitted? 'light-green-lighten-5':'orange-lighten-5'"
+                    hover
+                    @click=""
             >
               <v-card-item :title="AM.name"
                            @click="AM.show = !AM.show"
@@ -82,17 +83,18 @@ const openUpload = (AM: Assignment) => {
                 <template v-slot:subtitle>
                   <v-icon
                       class="me-1 pb-1"
-                      :color="AM.total === AM.submitted ? 'success': 'white'"
+                      :color="AM.total === AM.submitted ? 'success': 'blue-darken-1'"
                       :icon="AM.total === AM.submitted ? 'mdi-check-circle' : 'mdi-alert-circle'"
                       size="15"
                   ></v-icon>
-                  {{ AM.total === AM.submitted ? '已提交' : '未提交' }}
+                  {{ AM.total === AM.submitted ? '已完成' : '收集中' }}
                 </template>
-                <v-card-text style="color:red" v-show="checkIsOutdated(AM.deadline)">
+                <v-divider></v-divider>
+                <v-card-text>
                   截止日期: {{ AM.deadline }}
                 </v-card-text>
-                <v-card-text v-show="!checkIsOutdated(AM.deadline)">
-                  截止日期: {{ AM.deadline }}
+                <v-card-text>
+                  {{AM.description}}
                 </v-card-text>
               </v-card-item>
 

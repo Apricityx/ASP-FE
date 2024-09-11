@@ -4,7 +4,9 @@ import {type Ref, ref} from "vue";
 import type {Assignment} from "@/requests/getAM"
 import {getStdIdList} from "@/requests/getStdIdList";
 import {getStdName} from "@/requests/getStdName";
+import axios from "axios";
 
+const formDom = ref()
 const props = defineProps({
   message: {
     type: String,
@@ -45,15 +47,48 @@ const validRule = ref({
 const Form = ref({
   name: '',
   id: '',
-  file: undefined
+  file: []
 })
 Form.value.id = undefined as unknown as string
 // 获取学生ID
 const stdID: Ref<string[]> = ref([])
 getStdIdList(stdID)
 // 提交文件
-const submitFile = () => {
-  console.log(Form)
+// 遮罩层
+const snackbarOpen = ref(false)
+const submitLoading = ref(false)
+const validate = async () => {
+  const {valid} = await formDom.value.validate();
+  return valid
+};
+const submitFile = async (AM: Assignment) => {
+  if (!await validate()) {
+    return
+  }
+  submitLoading.value = true
+  const formData = new FormData();
+  console.log(AM);
+  formData.append('id', Form.value.id);
+  formData.append('name', Form.value.name);
+  formData.append('assignment_id', AM.name);
+  if (Form.value.file && Form.value.file.length > 0) {
+    Form.value.file.forEach((file) => {
+      formData.append('file', file);
+    });
+  }
+
+  try {
+    const response = await axios.post(Config.beServerAddress + '/api/v1/files/upload_file', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    console.log('上传成功', response.data);
+    submitLoading.value = false
+    snackbarOpen.value = true
+  } catch (error) {
+    console.error('上传失败', error);
+  }
 }
 // 自动填充姓名
 const searchNameDisabled = ref(true)
@@ -74,9 +109,25 @@ setInterval(() => {
 </script>
 
 <template>
-<!--  服务器地址：{{ Config.beServerAddress }}-->
-<!--  {{ AM.name }}-->
-<!--  {{ checkIsOutdated() }}-->
+  <v-snackbar
+      v-model="snackbarOpen"
+      location="end top"
+  >
+    <div class="text-subtitle-1 pb-2">提交成功</div>
+    <p>如需更改文件请重复提交</p>
+    <template v-slot:actions>
+      <v-btn
+          color="indigo"
+          variant="text"
+          @click="snackbarOpen = false"
+      >
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
+  <!--  服务器地址：{{ Config.beServerAddress }}-->
+  <!--  {{ AM.name }}-->
+  <!--  {{ checkIsOutdated() }}-->
   <v-card
       class="mx-auto mt-5"
       prepend-icon="mdi-upload"
@@ -102,14 +153,14 @@ setInterval(() => {
           <v-divider></v-divider>
 
           <v-card-item>
-            <v-form>
+            <v-form ref="formDom">
               <v-container>
                 <v-row>
                   <v-col
                       cols="12"
                       md="4"
                   >
-                    <v-select
+                    <v-combobox
                         v-model="Form.id"
                         :counter="10"
                         :rules="validRule.idRules"
@@ -117,7 +168,7 @@ setInterval(() => {
                         :items="stdID"
                         hide-details
                         required
-                    ></v-select>
+                    ></v-combobox>
                   </v-col>
 
                   <v-col
@@ -164,7 +215,8 @@ setInterval(() => {
                   <v-btn
                       block
                       color="primary"
-                      @click="submitFile()"
+                      @click="submitFile(AM)"
+                      :loading="submitLoading"
                   >提交
                   </v-btn>
                 </v-row>
