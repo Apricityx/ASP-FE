@@ -3,10 +3,9 @@
 import router from "@/router";
 import {ref} from "vue";
 import {tr} from "vuetify/locale";
-import check from "@/component/checkAM.vue";
 import {AMListModel} from "@/requests/getAM";
 import type {Assignment} from "@/requests/getAM";
-import {stdInfo} from "@/requests/getStdInfo";
+import Upload from "@/component/upload.vue";
 
 // 检查作业是否逾期未交
 const checkIsOutdated = (AMDeadline:string) => {
@@ -42,7 +41,6 @@ const openUpload = (AM: Assignment) => {
         <v-toolbar-title>提交</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <check :message="JSON.stringify(uploadAM)"/>
     </v-card>
   </v-dialog>
 
@@ -84,11 +82,11 @@ const openUpload = (AM: Assignment) => {
                 <template v-slot:subtitle>
                   <v-icon
                       class="me-1 pb-1"
-                      :color="AM.isSubmitted ? 'success': 'warning'"
-                      :icon="AM.isSubmitted ? 'mdi-check-circle' : 'mdi-alert-circle'"
+                      :color="AM.total === AM.submitted ? 'success': 'white'"
+                      :icon="AM.total === AM.submitted ? 'mdi-check-circle' : 'mdi-alert-circle'"
                       size="15"
                   ></v-icon>
-                  {{ AM.isSubmitted ? '已提交' : '未提交' }}
+                  {{ AM.total === AM.submitted ? '已提交' : '未提交' }}
                 </template>
                 <v-card-text style="color:red" v-show="checkIsOutdated(AM.deadline)">
                   截止日期: {{ AM.deadline }}
@@ -101,38 +99,10 @@ const openUpload = (AM: Assignment) => {
               <v-expand-transition>
                 <div v-show="AM.show" style="height: 70px;">
                   <v-divider></v-divider>
-                  <v-row v-show="AM.isSubmitted" style="margin:5px">
-                    <v-col cols="3">
-                      <v-btn block color="light-blue-darken-1" prepend-icon="mdi-upload-off"
-                             elevation="0" text="已提交" disabled></v-btn>
-                    </v-col>
-                    <v-col cols="3">
-                      <v-btn
-                          block color="light-blue-darken-1" prepend-icon="mdi-pencil"
-                          elevation="0" text="修改"
-                          @click="openUpload(AM)"
-                      ></v-btn>
-                    </v-col>
-                    <v-col cols="3">
-                      <v-btn block color="light-blue-darken-1" prepend-icon="mdi-eye-outline"
-                             elevation="0" text="查看"></v-btn>
-                    </v-col>
-                  </v-row>
-                  <v-row v-show="!AM.isSubmitted" style="margin:5px">
-                    <v-col cols="3">
-                      <v-btn
-                          block color="light-blue-darken-1" prepend-icon="mdi-upload"
-                          elevation="0" text="提交"
-                          @click="openUpload(AM)"
-                      ></v-btn>
-                    </v-col>
-                    <v-col cols="3">
-                      <v-btn block color="light-blue-darken-1" prepend-icon="mdi-pencil"
-                             elevation="0" text="修改" disabled></v-btn>
-                    </v-col>
-                    <v-col cols="3">
-                      <v-btn block color="light-blue-darken-1" prepend-icon="mdi-eye-off-outline"
-                             elevation="0" text="查看" disabled></v-btn>
+                  <v-row style="margin:5px">
+                    <v-col block>
+                      <v-btn block color="light-blue-darken-1" prepend-icon="mdi-upload"
+                             elevation="0" text="提交" @click="openUpload(AM)"></v-btn>
                     </v-col>
                   </v-row>
                 </div>

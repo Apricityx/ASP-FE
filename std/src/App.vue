@@ -41,7 +41,9 @@ const getGreeting = () => {
     </v-app-bar>
 
     <v-main class="d-flex align-center justify-center mx-auto" style="min-height: 1000px;background-color: #fafafa">
-      <v-spacer style="margin: 10px"><RouterView/></v-spacer>
+      <v-spacer style="margin: 10px">
+        <RouterView/>
+      </v-spacer>
     </v-main>
   </v-layout>
 </template>

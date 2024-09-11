@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {Config} from "@/loadConfig";
-import {ref} from "vue";
-import {stdInfo} from "@/requests/getStdInfo";
+import {type Ref, ref} from "vue";
 import type {Assignment} from "@/requests/getAM"
-import type { StdInfo } from "@/requests/getStdInfo"
+import {getStdIdList} from "@/requests/getStdIdList";
+import {getStdName} from "@/requests/getStdName";
 
 const props = defineProps({
   message: {
@@ -19,28 +19,66 @@ const checkIsOutdated = () => {
 }
 
 // 表单验证
-const valid = ref(true)
+const valid = ref(false)
+const loadingName = ref(false)
 const validRule = ref({
   nameRules: [
     (value: string) => {
+// 获取学生姓名
       return !!value || 'Name is required'
+    }
+  ],
+  idRules: [
+    (value: string) => {
+      if (!value) {
+        searchNameDisabled.value = false
+      }
+      return !!value || '请填写ID'
+    }
+  ],
+  fileRules: [
+    (value: any) => {
+      return !!value[0] || '请上传文件'
     }
   ]
 })
 const Form = ref({
   name: '',
-  lastname: '',
-  email: ''
+  id: '',
+  file: undefined
 })
-Form.value.name = stdInfo.name
+Form.value.id = undefined as unknown as string
+// 获取学生ID
+const stdID: Ref<string[]> = ref([])
+getStdIdList(stdID)
+// 提交文件
+const submitFile = () => {
+  console.log(Form)
+}
+// 自动填充姓名
+const searchNameDisabled = ref(true)
+const loadStdName = async () => {
+  searchNameDisabled.value = true
+  loadingName.value = true
+  await getStdName(Form, Form.value.id, loadingName)
+  loadingName.value = false
+  searchNameDisabled.value = false
+}
+let idNow = ''
+setInterval(() => {
+  if (idNow !== Form.value.id) {
+    idNow = Form.value.id
+    loadStdName()
+  }
+}, 500)
 </script>
 
 <template>
-  服务器地址：{{ Config.beServerAddress }}
-  {{ AM.name }}
-  {{ checkIsOutdated() }}
+<!--  服务器地址：{{ Config.beServerAddress }}-->
+<!--  {{ AM.name }}-->
+<!--  {{ checkIsOutdated() }}-->
   <v-card
-      class="mx-auto"
+      class="mx-auto mt-5"
       prepend-icon="mdi-upload"
       :subtitle="`${AM.name}`"
       width="80%"
@@ -64,51 +102,75 @@ Form.value.name = stdInfo.name
           <v-divider></v-divider>
 
           <v-card-item>
-            <v-container>
-              <v-row>
-                <v-col
-                    cols="12"
-                    md="4"
-                >
-                  <v-text-field
-                      v-model="Form.name"
-                      :counter="10"
-                      :rules="validRule.nameRules"
-                      label="姓名"
-                      hide-details
-                      required
-                      disabled
-                  ></v-text-field>
-                </v-col>
+            <v-form>
+              <v-container>
+                <v-row>
+                  <v-col
+                      cols="12"
+                      md="4"
+                  >
+                    <v-select
+                        v-model="Form.id"
+                        :counter="10"
+                        :rules="validRule.idRules"
+                        label="ID"
+                        :items="stdID"
+                        hide-details
+                        required
+                    ></v-select>
+                  </v-col>
 
-                <v-col
-                    cols="12"
-                    md="4"
-                >
-                  <v-text-field
-                      v-model="lastname"
-                      :counter="10"
-                      :rules="nameRules"
-                      label="Last name"
-                      hide-details
-                      required
-                  ></v-text-field>
-                </v-col>
+                  <v-col
+                      cols="12"
+                      md="4"
+                  >
+                    <v-text-field
+                        v-model="Form.name"
+                        :loading="loadingName"
+                        :counter="10"
+                        :rules="validRule.nameRules"
+                        label="姓名"
+                        hide-details
+                        required
+                        :disabled="searchNameDisabled"
+                    ></v-text-field>
+                  </v-col>
 
-                <v-col
-                    cols="12"
-                    md="4"
-                >
-                  <v-text-field
-                      v-model="email"
-                      :rules="emailRules"
-                      label="E-mail"
-                      hide-details
-                      required
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-container>
+                  <v-col
+                      cols="12"
+                      md="4"
+                  >
+                    <v-file-input
+                        label="上传文件"
+                        v-model="Form.file"
+                        :rules="validRule.fileRules"
+                        chips
+                        counter
+                        multiple
+                        show-size
+                    />
+                  </v-col>
+                </v-row>
+                <!--                <v-row style="margin-bottom: 10px">-->
+                <!--                  <v-btn-->
+                <!--                      block-->
+                <!--                      color="primary"-->
+                <!--                      @click="loadStdName()"-->
+                <!--                      :disabled="searchNameDisabled"-->
+                <!--                      text="查询名字"-->
+                <!--                  />-->
+                <!--                </v-row>-->
+                <v-row>
+                  <v-btn
+                      block
+                      color="primary"
+                      @click="submitFile()"
+                  >提交
+                  </v-btn>
+                </v-row>
+              </v-container>
+
+            </v-form>
           </v-card-item>
         </template>
       </v-card-item>
