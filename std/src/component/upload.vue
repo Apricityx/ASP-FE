@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {Config} from "@/loadConfig";
 import {type Ref, ref} from "vue";
-import type {Assignment} from "@/requests/getAM"
 import {getStdIdList} from "@/requests/getStdIdList";
 import {getStdName} from "@/requests/getStdName";
 import axios from "axios";
 import {tr} from "vuetify/locale";
+import type {AssignmentDetailed} from "@/requests/getAM";
 // 消息条
 const snackbar = ref(false)
 const snackbarTitle = ref('')
@@ -24,7 +24,7 @@ const props = defineProps({
     required: true
   }
 })
-const AM: Assignment = JSON.parse(props.message)
+const AM: AssignmentDetailed = JSON.parse(props.message)
 const checkIsOutdated = () => {
   const now = new Date()
   const deadline = new Date(AM.deadline)
@@ -72,14 +72,13 @@ const validate = async () => {
   const {valid} = await formDom.value.validate();
   return valid
 };
-const submitFile = async (AM: Assignment) => {
+const submitFile = async (AM: AssignmentDetailed) => {
   if (!await validate()) {
 
     return
   }
   submitLoading.value = true
   const formData = new FormData();
-  console.log(AM);
   formData.append('id', Form.value.id);
   formData.append('name', Form.value.name);
   formData.append('assignment_id', AM.name);
@@ -126,7 +125,7 @@ setInterval(() => {
       loadStdName()
     }
   }
-}, 3000)
+}, 800)
 </script>
 
 <template>

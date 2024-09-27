@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {ref} from 'vue'
+import {type Ref, ref} from 'vue'
 import router from "@/router";
 import {tr} from "vuetify/locale";
-import {AMListModel, type Assignment} from "@/requests/getAM";
 import {switchMonthCounter, switchAllCounter, type SubmitCounter} from "@/requests/getAMCounter";
 import {all} from "axios";
 import {red} from "vuetify/util/colors";
+import {type AssignmentPreview, getAMPreview} from "@/requests/getAM";
 
 // 计算总进度条
 
@@ -57,8 +57,9 @@ const changeCountType = () => {
   isShowAsMonth.value = !isShowAsMonth.value
 }
 
-// 将AMList转换为ref供可响应变量使用
-const AMList = ref(AMListModel)
+// 初始化AMList
+const AMList: Ref<AssignmentPreview[]> = ref([] as AssignmentPreview[])
+getAMPreview(AMList)
 </script>
 
 <template>
@@ -76,7 +77,10 @@ const AMList = ref(AMListModel)
         <v-divider></v-divider>
 
         <v-card-text class="text-medium-emphasis pa-6">
-          <div class="text-h4 font-weight-black mb-4">{{ counterLoading ? '- -' : getCount.assignment_progress + '%' }}</div>
+          <div class="text-h4 font-weight-black mb-4">{{
+              counterLoading ? '- -' : getCount.assignment_progress + '%'
+            }}
+          </div>
 
           <v-progress-linear
               bg-color="surface-variant"
@@ -113,6 +117,7 @@ const AMList = ref(AMListModel)
         </template>
         <v-row style="margin:0 2% 2% 2%">
           <v-col cols="12">
+            <!--            Fix-->
             <v-card v-for="AM in AMList" style="margin-bottom: 2%"
                     hover
                     variant="elevated"
@@ -139,13 +144,14 @@ const AMList = ref(AMListModel)
                     <v-progress-linear
                         color="light-blue"
                         height="5"
-                        :model-value="AM.submitted / AM.total * 100"
+                        :model-value="Number(AM.submitted)/ Number(AM.total) * 100"
                         striped
                     ></v-progress-linear>
                   </v-card-text>
                 </div>
               </v-expand-transition>
             </v-card>
+            <!--            Fix-->
           </v-col>
         </v-row>
       </v-card>

@@ -3,31 +3,31 @@
 import router from "@/router";
 import {ref} from "vue";
 import {tr} from "vuetify/locale";
-import {AMListModel} from "@/requests/getAM";
-import type {Assignment} from "@/requests/getAM";
 import Upload from "@/component/upload.vue";
+import {type AssignmentDetailed, getAMDetailed} from "@/requests/getAM";
 
 // 检查作业是否逾期未交
-const checkIsOutdated = (AMDeadline:string) => {
+const checkIsOutdated = (AMDeadline: string) => {
   const now = new Date()
   const deadline = new Date(AMDeadline)
   return now > deadline
 }
 
-const AMList = ref(AMListModel)
+const AMList = ref()
 
 // 当isLoadingAM为T时，按钮和列表都会重新加载
 const isLoadingAM = ref(false)
 const getAssignments = async () => {
+  await getAMDetailed(AMList)
   isLoadingAM.value = true
   setTimeout(() => {
     isLoadingAM.value = false
   }, 2000)
 }
-
+getAMDetailed(AMList)
 const dialog = ref(false)
-let uploadAM = {} as Assignment
-const openUpload = (AM: Assignment) => {
+let uploadAM = {} as AssignmentDetailed
+const openUpload = (AM: AssignmentDetailed) => {
   uploadAM = AM
   dialog.value = true
 }
@@ -83,18 +83,18 @@ const openUpload = (AM: Assignment) => {
                 <template v-slot:subtitle>
                   <v-icon
                       class="me-1 pb-1"
-                      :color="AM.total === AM.submitted ? 'success': 'blue-darken-1'"
-                      :icon="AM.total === AM.submitted ? 'mdi-check-circle' : 'mdi-alert-circle'"
+                      :color="checkIsOutdated(AM.deadline) ? 'success': 'blue-darken-1'"
+                      :icon="checkIsOutdated(AM.deadline) ? 'mdi-check-circle' : 'mdi-alert-circle'"
                       size="15"
                   ></v-icon>
-                  {{ AM.total === AM.submitted ? '已完成' : '收集中' }}
+                  {{ checkIsOutdated(AM.deadline) ? '已完成' : '收集中' }}
                 </template>
                 <v-divider></v-divider>
                 <v-card-text>
                   截止日期: {{ AM.deadline }}
                 </v-card-text>
                 <v-card-text>
-                  {{AM.description}}
+                  {{ AM.description }}
                 </v-card-text>
               </v-card-item>
 
