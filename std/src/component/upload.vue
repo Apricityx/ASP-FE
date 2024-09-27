@@ -5,7 +5,18 @@ import type {Assignment} from "@/requests/getAM"
 import {getStdIdList} from "@/requests/getStdIdList";
 import {getStdName} from "@/requests/getStdName";
 import axios from "axios";
-
+import {tr} from "vuetify/locale";
+// 消息条
+const snackbar = ref(false)
+const snackbarTitle = ref('')
+const snackbarSubtitle = ref('')
+const newMessage = (title: string, subtitle: string, type: "warning" | "info") => {
+  snackbar.value = true
+  snackbarTitle.value = title
+  snackbarSubtitle.value = subtitle
+}
+// Switcher
+const switcher = ref(true)
 const formDom = ref()
 const props = defineProps({
   message: {
@@ -55,7 +66,7 @@ const stdID: Ref<string[]> = ref([])
 getStdIdList(stdID)
 // 提交文件
 // 遮罩层
-const snackbarOpen = ref(false)
+
 const submitLoading = ref(false)
 const validate = async () => {
   const {valid} = await formDom.value.validate();
@@ -63,6 +74,7 @@ const validate = async () => {
 };
 const submitFile = async (AM: Assignment) => {
   if (!await validate()) {
+
     return
   }
   submitLoading.value = true
@@ -85,41 +97,50 @@ const submitFile = async (AM: Assignment) => {
     });
     console.log('上传成功', response.data);
     submitLoading.value = false
-    snackbarOpen.value = true
+    newMessage("作业提交成功", "如需修改请再次提交", "info")
   } catch (error) {
     console.error('上传失败', error);
+    newMessage("作业提交失败", "请稍后再试或联系管理员", "warning")
+    submitLoading.value = false
   }
 }
 // 自动填充姓名
 const searchNameDisabled = ref(true)
 const loadStdName = async () => {
-  searchNameDisabled.value = true
-  loadingName.value = true
-  await getStdName(Form, Form.value.id, loadingName)
-  loadingName.value = false
-  searchNameDisabled.value = false
+  if (switcher.value) {
+    searchNameDisabled.value = true
+    loadingName.value = true
+    const getStdNameStatus = await getStdName(Form, Form.value.id, loadingName)
+    loadingName.value = false
+    searchNameDisabled.value = false
+    if (!getStdNameStatus) {
+      newMessage("查询失败", "ID不存在或服务器连接失败", "warning")
+    }
+  }
 }
 let idNow = ''
 setInterval(() => {
   if (idNow !== Form.value.id) {
     idNow = Form.value.id
-    loadStdName()
+    if (idNow) {
+      loadStdName()
+    }
   }
-}, 500)
+}, 3000)
 </script>
 
 <template>
   <v-snackbar
-      v-model="snackbarOpen"
+      v-model="snackbar"
       location="end top"
   >
-    <div class="text-subtitle-1 pb-2">提交成功</div>
-    <p>如需更改文件请重复提交</p>
+    <div class="text-subtitle-1 pb-2">{{ snackbarTitle }}</div>
+    <p>{{ snackbarSubtitle }}</p>
     <template v-slot:actions>
       <v-btn
           color="indigo"
           variant="text"
-          @click="snackbarOpen = false"
+          @click="snackbar = false"
       >
         Close
       </v-btn>
@@ -150,8 +171,14 @@ setInterval(() => {
             ></v-icon>
             此作业已超过提交截止时间，有可能不会查阅你的作业
           </v-container>
-          <v-divider></v-divider>
 
+          <v-card-actions>
+            <v-switch label="自动填充名字"
+                      color="primary"
+                      v-model="switcher"
+            ></v-switch>
+          </v-card-actions>
+          <v-divider></v-divider>
           <v-card-item>
             <v-form ref="formDom">
               <v-container>
@@ -221,7 +248,6 @@ setInterval(() => {
                   </v-btn>
                 </v-row>
               </v-container>
-
             </v-form>
           </v-card-item>
         </template>

@@ -2,6 +2,7 @@
 import {RouterLink, RouterView} from 'vue-router'
 import {ref} from 'vue'
 import router from "@/router";
+import {Config} from "./loadConfig";
 
 const drawerOpen = ref(true)
 const Std = ref()
@@ -64,7 +65,7 @@ const page = ref('stdIndex')
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen"></v-app-bar-nav-icon>
       </template>
-      <v-app-bar-title>软工中外作业提交</v-app-bar-title>
+      <v-app-bar-title>{{Config.title}}</v-app-bar-title>
     </v-app-bar>
 
     <v-main class="d-flex align-center justify-center mx-auto" style="min-height: 1000px;background-color: #fafafa">
