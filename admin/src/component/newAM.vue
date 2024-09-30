@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import {Config} from "@/loadConfig";
-import {ref} from "vue";
-import {stdInfo} from "@/requests/getStdInfo";
-import type {Assignment} from "@/requests/getAM"
-import type {StdInfo} from "@/requests/getStdInfo"
+import {type Ref, ref} from "vue";
+import type {Assignment} from "@/requests/get_am"
 import {tr} from "vuetify/locale";
+import App from "@/App.vue";
+import axios from "axios";
+import {createAM} from "@/requests/create_am";
 
+// 获取父组件传参
+const props = defineProps<{
+  closeNewAM: () => void
+}>()
 // 表单验证
 const valid = ref(false)
 const validRule = ref({
@@ -67,18 +72,44 @@ const Form = ref({
   AMDeadlineMonth: 1,
   AMDeadlineDay: 1,
   AMDescription: '',
-  AMDeadlineHour: 1,
+  AMDeadline: ''
 })
 // 提交表单
-const submitAM = () => {
+const formDom = ref()
+const submitLoading = ref(false)
+const submitAM = async () => {
+  submitLoading.value = true
+  const {valid} = await formDom.value.validate()
+  if (!valid) {
+    setTimeout(() => {
+      submitLoading.value = false
+    }, 200)
+    return
+  }
+  Form.value.AMDeadline = `${Form.value.AMDeadlineYear}-${Form.value.AMDeadlineMonth}-${Form.value.AMDeadlineDay}`
 
+  createAM({
+    // 传给后端的数据
+    name: Form.value.AMName,
+    deadline: Form.value.AMDeadline,
+    description: Form.value.AMDescription
+  })
+      .then((res) => {
+        if (res) {
+          props.closeNewAM()
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      }).finally(() => {
+    submitLoading.value = false
+  })
 }
 
 const timeNow = new Date()
 Form.value.AMDeadlineYear = timeNow.getFullYear()
 Form.value.AMDeadlineMonth = timeNow.getMonth() + 1
 Form.value.AMDeadlineDay = timeNow.getDate()
-Form.value.AMDeadlineHour = timeNow.getHours() === 23 ? 23 : timeNow.getHours() + 1
 const generateDay = () => {
   const month = Form.value.AMDeadlineMonth
   if (month === 2) {
@@ -122,7 +153,7 @@ const generateDay = () => {
 
           <v-card-item>
             <v-container>
-              <v-form>
+              <v-form ref="formDom">
                 <v-row>
                   <v-col
                       cols="12"
@@ -159,12 +190,12 @@ const generateDay = () => {
                         :items="Array.from({length: generateDay()}, (v, k) => 1 + k)"
                         :rules="validRule.dayRules"
                     />
-                    <v-select
-                        v-model="Form.AMDeadlineHour"
-                        label="时"
-                        :items="Array.from({length:24}, (v, k) => k)"
-                        :rules="validRule.hourRules"
-                    />
+                    <!--                    <v-select-->
+                    <!--                        v-model="Form.AMDeadlineHour"-->
+                    <!--                        label="时"-->
+                    <!--                        :items="Array.from({length:24}, (v, k) => k)"-->
+                    <!--                        :rules="validRule.hourRules"-->
+                    <!--                    />-->
 
                   </v-col>
 
@@ -181,9 +212,10 @@ const generateDay = () => {
                   </v-col>
                 </v-row>
                 <v-btn
-                    @click="submitAM"
+                    @click="submitAM()"
                     block
                     text="提交"
+                    :loading="submitLoading"
                 />
               </v-form>
             </v-container>

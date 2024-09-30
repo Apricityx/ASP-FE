@@ -24,17 +24,17 @@ const getGreeting = () => {
       <v-list-item :title="getGreeting() + ' Apricityx'" subtitle="Student"></v-list-item>
       <v-divider></v-divider>
       <v-list-item link title="Overview" @click="router.push('/')"></v-list-item>
+      <v-list-item link title="Students" @click="router.push('/students')"></v-list-item>
       <v-list-item link title="Assignments" @click="router.push('/assignments')"></v-list-item>
     </v-navigation-drawer>
 
     <v-app-bar :elevation="2">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen"></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen"/>
       </template>
-      <v-app-bar-title>Application Bar</v-app-bar-title>
     </v-app-bar>
 
-    <v-main class="d-flex align-center justify-center mx-auto" style="min-height: 1000px;background-color: #fafafa">
+    <v-main class="d-flex align-center justify-center mx-auto" style="background-color: #fafafa">
       <v-spacer style="margin: 10px"><RouterView/></v-spacer>
     </v-main>
   </v-layout>
