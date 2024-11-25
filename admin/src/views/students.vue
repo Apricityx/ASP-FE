@@ -9,7 +9,6 @@ const newStdOpen = ref(false)
 const isLoadingStd = ref(true)
 const STDList: Ref<Student[]> = ref([])
 const getStudents = async () => {
-  //Todo: get students
   isLoadingStd.value = true
   await get_student_list(STDList)
   isLoadingStd.value = false
@@ -87,7 +86,6 @@ const checkIsSelected = (STDList: any) => {
       <v-list-subheader>Group 1</v-list-subheader>
       <v-list-item v-for="STD in STDList" :value="STD.id" :active="STD.isActive"
                    @click="STD.isActive = !STD.isActive">
-        <!--            todo-->
         <template v-slot:prepend="{isActive}">
           <v-list-item-action start>
             <v-checkbox-btn :model-value="STD.isActive"></v-checkbox-btn>

@@ -176,7 +176,6 @@ const submit = async () => {
           <v-list-subheader>New Students Buffer</v-list-subheader>
           <v-list-item v-for="STD in STDList" :value="STD.id" :active="STD.isActive"
                        @click="STD.isActive = !STD.isActive">
-            <!--            todo-->
             <template v-slot:prepend="{isActive}">
               <v-list-item-action start>
                 <v-checkbox-btn :model-value="STD.isActive"></v-checkbox-btn>
@@ -270,8 +269,6 @@ const submit = async () => {
           />
         </template>
         <v-card-text>
-          <!--            todo-->
-
           <v-row dense>
             <v-file-input
                 label="Excel File*"

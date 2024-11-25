@@ -58,7 +58,7 @@ const openUpload = (AM: AssignmentDetailed) => {
 
   <v-row>
     <v-col cols="12">
-      <v-card :elevation="2" height="auto" width="auto" title="作业列表" :loading="isLoadingAM"
+      <v-card :elevation="2" height="auto" width="auto" title="作业列表" :loading="isLoadingAM" :disabled="isLoadingAM"
               style="user-select: none">
         <template v-slot:append>
           <v-btn
