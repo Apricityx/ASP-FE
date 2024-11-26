@@ -112,7 +112,7 @@ getAMPreview(AMList)
               text="前往提交"
               variant="outlined"
               slim
-              @click="router.push('/std/assignments')"
+              @click="router.push('/SE34/assignments')"
           ></v-btn>
         </template>
         <v-row style="margin:0 2% 2% 2%">

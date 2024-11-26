@@ -52,7 +52,7 @@ const page = ref('stdIndex')
                      active-color="primary"
                      value="2"
                      @click="()=>{
-        router.push('/std/assignments')
+        router.push('/SE34/assignments')
         page = 'stdAssignmentsList'
       }" >
           <template v-slot:prepend>

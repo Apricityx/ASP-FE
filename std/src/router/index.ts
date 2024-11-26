@@ -11,7 +11,7 @@ const router = createRouter({
     //   component: () => import('../views/Std/StdIndex.vue')
     // },
     {
-      path: '/std/assignments',
+      path: '/SE34/assignments',
       name: 'assignments',
       // @ts-ignore
       component: () => import('../views/Std/StdAssignmentList.vue')
