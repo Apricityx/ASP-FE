@@ -32,7 +32,7 @@ const page = ref('stdIndex')
   <v-layout class="rounded rounded-md">
     <v-navigation-drawer v-model="drawerOpen">
       <v-list>
-        <v-list-item :title="getGreeting() + ' ' + Std.name" subtitle="Student" style="margin: 10px"/>
+        <v-list-item :title="getGreeting() + ' ' + Std.name" subtitle="SE34s" style="margin: 10px"/>
         <v-divider></v-divider>
 <!--        <v-list-item link-->
 <!--                     title="概览"-->
@@ -54,7 +54,7 @@ const page = ref('stdIndex')
                      @click="()=>{
         router.push('/std/assignments')
         page = 'stdAssignmentsList'
-      }">
+      }" >
           <template v-slot:prepend>
             <v-icon>mdi-book-open-variant</v-icon>
           </template>
